@@ -80,12 +80,12 @@ public class iterativeTest extends LinearOpMode {
     private DcMotor reach = null;
     // dwayne the double reverse four bar
     //private DcMotor dave = null;
-    private CRServo intake1 = null;
-    private CRServo intake2 = null;
-    private Servo wrist1 = null;
-    private Servo wrist2 = null;
-    private Servo shoulder1 = null;
-    private Servo shoulder2 = null;
+    private CRServo intake1 = null; //5
+   // private CRServo intake2 = null;
+    private Servo wrist1 = null; //1 exp right
+    private Servo wrist2 = null; //4 left
+    private Servo shoulder1 = null; //0 exp right
+    private Servo shoulder2 = null; //3 left
     IMU imu;
 
     @Override
@@ -101,8 +101,8 @@ public class iterativeTest extends LinearOpMode {
         lift = hardwareMap.get(DcMotor.class, "lift");
         reach = hardwareMap.get(DcMotor.class, "reach");
         //dave = hardwareMap.get(DcMotor.class, "dave");
-        intake1 = hardwareMap.get(CRServo.class, "intake1");
-        intake2 = hardwareMap.get(CRServo.class, "intake2");
+        intake1 = hardwareMap.get(CRServo.class, "intake");
+//        intake2 = hardwareMap.get(CRServo.class, "intake2");
         wrist1 = hardwareMap.get(Servo.class, "wrist1");
         wrist2 = hardwareMap.get(Servo.class, "wrist2");
         shoulder1 = hardwareMap.get(Servo.class, "shoulder1");
@@ -239,8 +239,8 @@ public class iterativeTest extends LinearOpMode {
             }
 
 
-            lift.setPower(-gamepad2.left_stick_y);
-            reach.setPower(-gamepad2.right_stick_y);
+            lift.setPower(-gamepad2.left_stick_y*.5);
+            reach.setPower(-gamepad2.right_stick_y*.8);
 
 //            if(gamepad2.right_trigger > 0.5){
 //                dave.setPower(-0.6);
@@ -250,46 +250,46 @@ public class iterativeTest extends LinearOpMode {
 //                dave.setPower(0.6);
 //                //up
 //            }
-            intake2.setDirection(DcMotorSimple.Direction.REVERSE);
+//            intake2.setDirection(DcMotorSimple.Direction.REVERSE);
 
             if(gamepad2.a){
                 //open
                 intake1.setPower(0.5);
-                intake2.setPower(0.5);
+//                intake2.setPower(0.5);
             }
             if(gamepad2.b){
                 //close
                 intake1.setPower(-0.5);
-                intake2.setPower(-0.5);
+//                intake2.setPower(-0.5);
             }
-            else{
+            else if (!gamepad2.left_bumper){
                 intake1.setPower(0);
-                intake2.setPower(0);
+//                intake2.setPower(0);
             }
-
             //TODO get wrist and shoulder servo position
             if(gamepad2.right_bumper){
                 //wrist up
                 wrist1.setPosition(1);
-                wrist2.setPosition(1);
+                wrist2.setPosition(.2);
             }
 
             if(gamepad2.left_bumper){
                 //wrist down
-                wrist1.setPosition(2);
-                wrist2.setPosition(2);
+                intake1.setPower(-.5);
+                wrist1.setPosition(.5);
+                wrist2.setPosition(.7);
             }
 
             if(gamepad2.right_trigger >= 0.5){
                 //shoulder up
-                shoulder1.setPosition(1);
-                shoulder2.setPosition(1);
+                shoulder1.setPosition(.7);
+                shoulder2.setPosition(.5);
             }
 
             if(gamepad2.left_trigger >= 0.5){
                 //shoudler down
-                shoulder1.setPosition(2);
-                shoulder2.setPosition(2);
+                shoulder1.setPosition(.3);
+                shoulder2.setPosition(.2);
             }
 
 
