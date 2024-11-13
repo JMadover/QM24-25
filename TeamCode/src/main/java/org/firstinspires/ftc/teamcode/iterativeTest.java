@@ -223,28 +223,28 @@ public class iterativeTest extends LinearOpMode {
                 rightBackPower  = -0.1;
             }
             if(gamepad1.dpad_left){
-                leftFrontPower  = -0.2;
-                rightFrontPower = 0.2;
-                leftBackPower   = 0.2;
-                rightBackPower  = -0.2;
+                leftFrontPower  = -0.3;
+                rightFrontPower = 0.3;
+                leftBackPower   = 0.3;
+                rightBackPower  = -0.3;
             }
             if(gamepad1.dpad_right){
-                leftFrontPower  = 0.2;
-                rightFrontPower = -0.2;
-                leftBackPower   = -0.2;
-                rightBackPower  = 0.2;
+                leftFrontPower  = 0.3;
+                rightFrontPower = -0.3;
+                leftBackPower   = -0.3;
+                rightBackPower  = 0.3;
             }
             if(gamepad1.right_bumper){
-                leftFrontPower  = 0.2;
-                rightFrontPower = -0.2;
-                leftBackPower   = 0.2;
-                rightBackPower  = -0.2;
+                leftFrontPower  = 0.4;
+                rightFrontPower = -0.4;
+                leftBackPower   = 0.4;
+                rightBackPower  = -0.4;
             }
             if(gamepad1.left_bumper){
-                leftFrontPower  = -0.2;
-                rightFrontPower = 0.2;
-                leftBackPower   = -0.2;
-                rightBackPower  = 0.2;
+                leftFrontPower  = -0.4;
+                rightFrontPower = 0.4;
+                leftBackPower   = -0.4;
+                rightBackPower  = 0.4;
             }
 
 
@@ -286,15 +286,15 @@ public class iterativeTest extends LinearOpMode {
             }
 
             if(gamepad2.right_trigger >= 0.5){
-                //shoulder up
+                //shoulder down
                 shoulder1.setPosition(1);
                 shoulder2.setPosition(.4);
             }
 
             if(gamepad2.left_trigger >= 0.5){
-                //shoulder down
-                shoulder1.setPosition(.5);
-                shoulder2.setPosition(.9);
+                //shoulder up
+                shoulder1.setPosition(.35);
+                shoulder2.setPosition(.95);
             }
 
 
