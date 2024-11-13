@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.ftc.Encoder;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -84,9 +85,18 @@ public class iterativeTest extends LinearOpMode {
    // private CRServo intake2 = null;
     private Servo wrist1 = null; //1 exp right
     private Servo wrist2 = null; //4 left
-    private Servo shoulder1 = null; //0 exp right
+    private Servo shoulder1 = null; //2 right
     private Servo shoulder2 = null; //3 left
+
+    final double WRIST1_DOWN = 0.2;
+    final double WRIST1_UP = 0.65;
+
+    final double WRIST2_DOWN = 0.2;
+    final double WRIST2_UP = 0.65;
+
+
     IMU imu;
+
 
     @Override
     public void runOpMode() {
@@ -102,7 +112,6 @@ public class iterativeTest extends LinearOpMode {
         reach = hardwareMap.get(DcMotor.class, "reach");
         //dave = hardwareMap.get(DcMotor.class, "dave");
         intake1 = hardwareMap.get(CRServo.class, "intake");
-//        intake2 = hardwareMap.get(CRServo.class, "intake2");
         wrist1 = hardwareMap.get(Servo.class, "wrist1");
         wrist2 = hardwareMap.get(Servo.class, "wrist2");
         shoulder1 = hardwareMap.get(Servo.class, "shoulder1");
@@ -239,7 +248,7 @@ public class iterativeTest extends LinearOpMode {
             }
 
 
-            lift.setPower(-gamepad2.left_stick_y*.5);
+            lift.setPower(gamepad2.left_stick_y*.5);
             reach.setPower(-gamepad2.right_stick_y*.8);
 
 //            if(gamepad2.right_trigger > 0.5){
@@ -250,46 +259,42 @@ public class iterativeTest extends LinearOpMode {
 //                dave.setPower(0.6);
 //                //up
 //            }
-//            intake2.setDirection(DcMotorSimple.Direction.REVERSE);
 
             if(gamepad2.a){
                 //open
-                intake1.setPower(0.5);
-//                intake2.setPower(0.5);
+                intake1.setPower(0.8);
             }
             if(gamepad2.b){
                 //close
-                intake1.setPower(-0.5);
-//                intake2.setPower(-0.5);
+                intake1.setPower(-0.8);
             }
-            else if (!gamepad2.left_bumper){
+            else if (!gamepad2.left_bumper){ //so it stays going while rotating
                 intake1.setPower(0);
-//                intake2.setPower(0);
             }
-            //TODO get wrist and shoulder servo position
+            //TODO get shoulder servo position
             if(gamepad2.right_bumper){
                 //wrist up
-                wrist1.setPosition(1);
-                wrist2.setPosition(.2);
+                wrist1.setPosition(WRIST1_UP);
+                wrist2.setPosition(WRIST2_UP);
             }
 
             if(gamepad2.left_bumper){
                 //wrist down
-                intake1.setPower(-.5);
-                wrist1.setPosition(.5);
-                wrist2.setPosition(.7);
+              //  intake1.setPower(-.5); //intake stays in
+                wrist1.setPosition(WRIST1_DOWN);
+                wrist2.setPosition(WRIST2_UP);
             }
 
             if(gamepad2.right_trigger >= 0.5){
                 //shoulder up
-                shoulder1.setPosition(.7);
-                shoulder2.setPosition(.5);
+                shoulder1.setPosition(1);
+                shoulder2.setPosition(.4);
             }
 
             if(gamepad2.left_trigger >= 0.5){
-                //shoudler down
-                shoulder1.setPosition(.3);
-                shoulder2.setPosition(.2);
+                //shoulder down
+                shoulder1.setPosition(.5);
+                shoulder2.setPosition(.9);
             }
 
 
