@@ -83,18 +83,18 @@ public class iterativeTest extends OpMode {
     private Servo shoulder1 = null; //port 2 control hub. right
     private Servo shoulder2 = null; //port 3 control hub. left
 
-    static final double WRIST1_DOWN = 0.2;
-    static final double WRIST1_UP = 0.65;
+    static final double WRIST1_DOWN = 0.675;
+    static final double WRIST1_UP = 0.2;
 
-    static final double WRIST2_DOWN = 0.2;
-    static final double WRIST2_UP = 0.65;
+    static final double WRIST2_DOWN = 0.675;
+    static final double WRIST2_UP = 0.2;
 
-    static final double INTAKE_PWR = .8;
+    static final double INTAKE_PWR = 1;
 
-    static final double SHOULDER1_DOWN = 1;
-    static final double SHOULDER1_UP = 0.35;
+    static final double SHOULDER1_DOWN = .7; //1
+    static final double SHOULDER1_UP = .1;
 
-    static final double SHOULDER2_DOWN = 0.4;
+    static final double SHOULDER2_DOWN = 0.35;
     static final double SHOULDER2_UP = 0.95;
 
     IMU imu;
@@ -133,10 +133,10 @@ public class iterativeTest extends OpMode {
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         reach.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+//        shoulder1.setDirection(Servo.Direction.FORWARD);
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
-        shoulder1.setPosition(SHOULDER1_DOWN);
-        shoulder2.setPosition(SHOULDER2_DOWN);
+
         intake.setPower(0);
 
         telemetry.addData("Status", "Initialized");
@@ -219,31 +219,31 @@ public class iterativeTest extends OpMode {
         }
 
 
-        lift.setPower(gamepad2.left_stick_y * .5);
-        reach.setPower(-gamepad2.right_stick_y * .8);
+        lift.setPower(gamepad2.left_stick_y * .8);
+        reach.setPower(-gamepad2.right_stick_y * .9);
 
 
         if (gamepad2.a) {
-            //intake
+            //outtake
             intake.setPower(INTAKE_PWR);
         }
         if (gamepad2.b) {
-            //outtake
+            //intake
             intake.setPower(-INTAKE_PWR);
         } else if (!gamepad2.left_bumper) { //so it stays going while rotating
             intake.setPower(0);
         }
         if (gamepad2.right_bumper) {
             //wrist up
-            wrist1.setPosition(WRIST1_UP);
-            wrist2.setPosition(WRIST2_UP);
-            intake.setPower(INTAKE_PWR);
+            wrist1.setPosition(WRIST1_DOWN);
+            wrist2.setPosition(WRIST2_DOWN);
+
         }
 
         if (gamepad2.left_bumper) {
-            //wrist down
-            wrist1.setPosition(WRIST1_DOWN);
-            wrist2.setPosition(WRIST2_DOWN);
+            wrist1.setPosition(WRIST1_UP);
+            wrist2.setPosition(WRIST2_UP);
+            intake.setPower(-INTAKE_PWR);
         }
 
         if (gamepad2.right_trigger >= 0.5) {
