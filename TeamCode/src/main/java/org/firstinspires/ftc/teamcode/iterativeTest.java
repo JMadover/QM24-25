@@ -101,7 +101,6 @@ public class iterativeTest extends OpMode {
     //TODO: ENCODERS FOR SLIDES - reach and lift
     static final double SLIDES_MAX = 0.7;
 
-    Boolean toggle = true;
     IMU imu;
 
 
@@ -163,64 +162,23 @@ public class iterativeTest extends OpMode {
 
     @Override
     public void loop() {
+        double leftFrontPower;
+        double leftBackPower;
+        double rightFrontPower;
+        double rightBackPower;
 
-        // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-        double axial = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-        double lateral = gamepad1.left_stick_x;
-        double yaw = gamepad1.right_stick_x;
-//            YawPitchRollAngles robotOrientation;
-//            robotOrientation = imu.getRobotYawPitchRollAngles();
-//            double robotyaw = robotOrientation.getYaw(AngleUnit.DEGREES);
-//            double axial = oglateral*Math.cos(robotyaw)-ogaxial*Math.sin(robotyaw);
-//            double lateral = oglateral*Math.cos(robotyaw)+ogaxial*Math.sin(robotyaw);
+        final double JOYSTICK_SEN = .007;
 
-        // Combine the joystick requests for each axis-motion to determine each wheel's power.
-        // Stay within range
+        double lx = Math.abs(gamepad1.left_stick_x)< JOYSTICK_SEN ? 0 : gamepad1.left_stick_x;
+        //lx is turning
+        double rx = Math.abs(gamepad1.right_stick_x)< JOYSTICK_SEN ? 0 : gamepad1.right_stick_x;
+        //rx is strafing
+        double ry = Math.abs(gamepad1.right_stick_y)< JOYSTICK_SEN ? 0 : gamepad1.right_stick_y;
 
-        double leftFrontPower = Range.clip(axial + lateral + yaw, -1.0, 1.0);
-        double rightFrontPower = Range.clip(axial - lateral - yaw, -1.0,1.0);
-        double leftBackPower = Range.clip(axial - lateral + yaw, -1.0,1.0);
-        double rightBackPower = Range.clip(axial + lateral - yaw, -1.0,1.0);
-
-        // Send calculated power to wheels
-
-        if (gamepad1.dpad_up) {
-            leftFrontPower = 0.1;
-            rightFrontPower = 0.1;
-            leftBackPower = 0.1;
-            rightBackPower = 0.1;
-        }
-        if (gamepad1.dpad_down) {
-            leftFrontPower = -0.1;
-            rightFrontPower = -0.1;
-            leftBackPower = -0.1;
-            rightBackPower = -0.1;
-        }
-        if (gamepad1.dpad_left) {
-            leftFrontPower = -0.3;
-            rightFrontPower = 0.3;
-            leftBackPower = 0.3;
-            rightBackPower = -0.3;
-        }
-        if (gamepad1.dpad_right) {
-            leftFrontPower = 0.3;
-            rightFrontPower = -0.3;
-            leftBackPower = -0.3;
-            rightBackPower = 0.3;
-        }
-        if (gamepad1.right_bumper) {
-            leftFrontPower = 0.4;
-            rightFrontPower = -0.4;
-            leftBackPower = 0.4;
-            rightBackPower = -0.4;
-        }
-        if (gamepad1.left_bumper) {
-            leftFrontPower = -0.4;
-            rightFrontPower = 0.4;
-            leftBackPower = -0.4;
-            rightBackPower = 0.4;
-        }
-
+        leftBackPower    = Range.clip(-lx - rx - ry, -1.0, 1.0);
+        leftFrontPower    = Range.clip(-lx + rx - ry, -1.0, 1.0);
+        rightFrontPower   = Range.clip(-lx + rx + ry, -1.0, 1.0);
+        rightBackPower   = Range.clip(-lx - rx + ry, -1.0, 1.0) ;
 
         lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
         reach.setPower(-gamepad2.right_stick_y * SLIDES_MAX);
@@ -232,17 +190,11 @@ public class iterativeTest extends OpMode {
         }
         if (gamepad2.a) {
             //intake
-
-            toggle = !toggle;
-        }
-        if(toggle) {
             intake.setPower(-INTAKE_PWR);
-        } else{
+        } else if (!(wrist1.getPosition() == WRIST1_DOWN)){
             intake.setPower(0);
         }
-        if (gamepad2.x){
-            wrist1.setPosition(.4);
-        }
+
         if (gamepad2.right_bumper) {
             //wrist up
             wrist1.setPosition(WRIST1_DOWN);
@@ -267,7 +219,7 @@ public class iterativeTest extends OpMode {
             shoulder2.setPosition(SHOULDER2_UP);
         }
 
-        double maxSpeed = .7;
+        double maxSpeed = .8;
         lf.setPower(leftFrontPower * maxSpeed);
         rf.setPower(rightFrontPower * maxSpeed);
         lb.setPower(leftBackPower * maxSpeed);

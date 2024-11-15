@@ -220,12 +220,22 @@ public class PinpointAuto extends LinearOpMode {
                 telemetry.addData("Velocity", velocity);
 
                 intake.setPower(-.7);
-                forwardDrive(.8, 175, pos.getX(DistanceUnit.INCH));
+                forwardDrive(.8, 155, pos.getX(DistanceUnit.INCH));
+                wrist1.setPosition(WRIST1_DOWN);
                 intake.setPower(.7);
-                strafeLeft(-.8, 20, pos.getY(DistanceUnit.INCH));
+                wrist1.setPosition(WRIST1_UP);
                 intake.setPower(0);
-                forwardDrive(-.8, 240, pos.getX(DistanceUnit.INCH));
-                strafeLeft(.8, 20, pos.getY(DistanceUnit.INCH));
+                forwardDrive(-.8, 10, pos.getX(DistanceUnit.INCH));
+                strafeLeft(-.8, 40, pos.getY(DistanceUnit.INCH)); //strafe right
+                intake.setPower(-.8);
+                forwardDrive(-.6, 5, pos.getX(DistanceUnit.INCH));
+                wrist1.setPosition(WRIST1_UP);
+                strafeLeft(.8, 40, pos.getY(DistanceUnit.INCH));
+                wrist1.setPosition(WRIST1_DOWN);
+                intake.setPower(.8);
+                wrist1.setPosition(WRIST1_UP);
+                intake.setPower(0);
+                forwardDrive(-.8, 175, pos.getX(DistanceUnit.INCH));
 
                 //                if(pos.getX(DistanceUnit.INCH)<175 && pos.getY(DistanceUnit.INCH) ==0){
 //                    forwardDrive(.8);
