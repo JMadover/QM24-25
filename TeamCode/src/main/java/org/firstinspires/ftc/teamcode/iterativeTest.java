@@ -83,13 +83,14 @@ public class iterativeTest extends OpMode {
     private Servo shoulder1 = null; //port 2 control hub. right
     private Servo shoulder2 = null; //port 3 control hub. left
 
-    static final double WRIST1_DOWN = 0.675;
+    static final double WRIST1_DOWN = 0.6;
     static final double WRIST1_UP = 0.2;
 
+    //TODO: FIND POSITIONS wrist 2
     static final double WRIST2_DOWN = 0.675;
     static final double WRIST2_UP = 0.2;
 
-    static final double INTAKE_PWR = 1;
+    static final double INTAKE_PWR = 0.95;
 
     static final double SHOULDER1_DOWN = .7; //1
     static final double SHOULDER1_UP = .1;
@@ -97,6 +98,10 @@ public class iterativeTest extends OpMode {
     static final double SHOULDER2_DOWN = 0.35;
     static final double SHOULDER2_UP = 0.95;
 
+    //TODO: ENCODERS FOR SLIDES - reach and lift
+    static final double SLIDES_MAX = 0.7;
+
+    Boolean toggle = true;
     IMU imu;
 
 
@@ -125,7 +130,6 @@ public class iterativeTest extends OpMode {
         rb.setDirection(DcMotor.Direction.FORWARD);
         lift.setDirection(DcMotor.Direction.FORWARD);
         reach.setDirection(DcMotor.Direction.FORWARD);
-        //dave.setDirection(DcMotor.Direction.FORWARD);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -133,7 +137,6 @@ public class iterativeTest extends OpMode {
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         reach.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        shoulder1.setDirection(Servo.Direction.FORWARD);
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
 
@@ -219,19 +222,26 @@ public class iterativeTest extends OpMode {
         }
 
 
-        lift.setPower(gamepad2.left_stick_y * .8);
-        reach.setPower(-gamepad2.right_stick_y * .9);
+        lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+        reach.setPower(-gamepad2.right_stick_y * SLIDES_MAX);
 
 
-        if (gamepad2.a) {
+        if (gamepad2.b) {
             //outtake
             intake.setPower(INTAKE_PWR);
         }
-        if (gamepad2.b) {
+        if (gamepad2.a) {
             //intake
+
+            toggle = !toggle;
+        }
+        if(toggle) {
             intake.setPower(-INTAKE_PWR);
-        } else if (!gamepad2.left_bumper) { //so it stays going while rotating
+        } else{
             intake.setPower(0);
+        }
+        if (gamepad2.x){
+            wrist1.setPosition(.4);
         }
         if (gamepad2.right_bumper) {
             //wrist up
@@ -239,7 +249,6 @@ public class iterativeTest extends OpMode {
             wrist2.setPosition(WRIST2_DOWN);
 
         }
-
         if (gamepad2.left_bumper) {
             wrist1.setPosition(WRIST1_UP);
             wrist2.setPosition(WRIST2_UP);
