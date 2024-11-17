@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -77,7 +78,8 @@ public class iterativeTest extends OpMode {
     private DcMotor lift = null;
     private DcMotor reach = null;
 
-    private CRServo intake = null; //port 5 control hub.
+    private CRServo intake1 = null; //port 5 control hub.
+    private CRServo intake2 = null; //port 0 exp hub.
     private Servo wrist1 = null; //port 1 expansion hub. right
     private Servo wrist2 = null; //port 4 control hub. left
     private Servo shoulder1 = null; //port 2 control hub. right
@@ -87,8 +89,8 @@ public class iterativeTest extends OpMode {
     static final double WRIST1_UP = 0.2;
 
     //TODO: FIND POSITIONS wrist 2
-    static final double WRIST2_DOWN = 0.675;
-    static final double WRIST2_UP = 0.2;
+    static final double WRIST2_DOWN = 0.475;
+    static final double WRIST2_UP = 0;
 
     static final double INTAKE_PWR = 0.95;
 
@@ -96,7 +98,7 @@ public class iterativeTest extends OpMode {
     static final double SHOULDER1_UP = .1;
 
     static final double SHOULDER2_DOWN = 0.35;
-    static final double SHOULDER2_UP = 0.95;
+    static final double SHOULDER2_UP = .95;
 
     //TODO: ENCODERS FOR SLIDES - reach and lift
     static final double SLIDES_MAX = 0.7;
@@ -117,14 +119,19 @@ public class iterativeTest extends OpMode {
         lift = hardwareMap.get(DcMotor.class, "lift");
         reach = hardwareMap.get(DcMotor.class, "reach");
         //dave = hardwareMap.get(DcMotor.class, "dave");
-        intake = hardwareMap.get(CRServo.class, "intake");
+        intake1 = hardwareMap.get(CRServo.class, "intake1");
+        intake2 = hardwareMap.get(CRServo.class, "intake2");
         wrist1 = hardwareMap.get(Servo.class, "wrist1");
         wrist2 = hardwareMap.get(Servo.class, "wrist2");
         shoulder1 = hardwareMap.get(Servo.class, "shoulder1");
         shoulder2 = hardwareMap.get(Servo.class, "shoulder2");
 
-        lf.setDirection(DcMotor.Direction.REVERSE);
-        lb.setDirection(DcMotor.Direction.REVERSE);
+//        lf.setDirection(DcMotor.Direction.REVERSE);
+//        lb.setDirection(DcMotor.Direction.REVERSE);
+//        rf.setDirection(DcMotor.Direction.FORWARD);
+//        rb.setDirection(DcMotor.Direction.FORWARD);
+        lf.setDirection(DcMotor.Direction.FORWARD);
+        lb.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.FORWARD);
         rb.setDirection(DcMotor.Direction.FORWARD);
         lift.setDirection(DcMotor.Direction.FORWARD);
@@ -139,7 +146,8 @@ public class iterativeTest extends OpMode {
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
 
-        intake.setPower(0);
+        intake1.setPower(0);
+        intake2.setPower(0);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -162,10 +170,13 @@ public class iterativeTest extends OpMode {
 
     @Override
     public void loop() {
+
         double leftFrontPower;
         double leftBackPower;
         double rightFrontPower;
         double rightBackPower;
+
+        boolean intake = false;
 
         final double JOYSTICK_SEN = .007;
 
@@ -180,31 +191,100 @@ public class iterativeTest extends OpMode {
         rightFrontPower   = Range.clip(-lx + rx + ry, -1.0, 1.0);
         rightBackPower   = Range.clip(-lx - rx + ry, -1.0, 1.0) ;
 
-        lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-        reach.setPower(-gamepad2.right_stick_y * SLIDES_MAX);
+        if (gamepad1.dpad_down) {
+            leftFrontPower = -0.3;
+            rightFrontPower = 0.3;
+            leftBackPower = -0.3;
+            rightBackPower = 0.3;
+        }
+        if (gamepad1.dpad_up) {
+            leftFrontPower = 0.3;
+            rightFrontPower = -0.3;
+            leftBackPower = 0.3;
+            rightBackPower = -0.3;
+        }
+        if (gamepad1.dpad_right) {
+            leftFrontPower = -0.3;
+            rightFrontPower = -0.3;
+            leftBackPower = 0.3;
+            rightBackPower = 0.3;
+        }
+        if (gamepad1.dpad_left) {
+            leftFrontPower = 0.3;
+            rightFrontPower = 0.3;
+            leftBackPower = -0.3;
+            rightBackPower = -0.3;
+        }
+        if (gamepad1.right_bumper) {
+            leftFrontPower = 0.4;
+            rightFrontPower = -0.4;
+            leftBackPower = 0.4;
+            rightBackPower = -0.4;
+        }
+        if (gamepad1.left_bumper) {
+            leftFrontPower = -0.4;
+            rightFrontPower = 0.4;
+            leftBackPower = -0.4;
+            rightBackPower = 0.4;
+        }
+
+        if(gamepad2.left_stick_y <0) {
+            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+        } else{
+            lift.setPower(gamepad2.left_stick_y * .25);
+        }
+        if(gamepad2.right_stick_y <0){
+            reach.setPower(-gamepad2.right_stick_y * 7);
+        } else {
+            reach.setPower(-gamepad2.right_stick_y * 25);
+        }
 
 
         if (gamepad2.b) {
             //outtake
-            intake.setPower(INTAKE_PWR);
+            intake = true;
+            intake2.setPower(INTAKE_PWR);
+            intake1.setPower(-INTAKE_PWR);
         }
         if (gamepad2.a) {
             //intake
-            intake.setPower(-INTAKE_PWR);
-        } else if (!(wrist1.getPosition() == WRIST1_DOWN)){
-            intake.setPower(0);
+            if (!intake) {
+                intake1.setPower(INTAKE_PWR);
+                intake2.setPower(-INTAKE_PWR);
+                intake = true;
+            } else {
+                intake = false;
+            }
         }
 
         if (gamepad2.right_bumper) {
-            //wrist up
+            //wrist down
             wrist1.setPosition(WRIST1_DOWN);
             wrist2.setPosition(WRIST2_DOWN);
 
         }
+
         if (gamepad2.left_bumper) {
+            //wrist moving up, intake goes on to keep block in
+            intake = true;
+            intake1.setPower(INTAKE_PWR);
+            intake2.setPower(-INTAKE_PWR);
             wrist1.setPosition(WRIST1_UP);
             wrist2.setPosition(WRIST2_UP);
-            intake.setPower(-INTAKE_PWR);
+        }
+
+//        if(lift.getCurrentPosition()<LIFT_MAX){
+//            //ensures vertical slides do not overextend
+//            lift.setPower(gamepad2.left_stick_y*SLIDES_MAX);
+//        } else {
+//            telemetry.addData("lift at its max", lift.getCurrentPosition());
+//            telemetry.update();
+//            lift.setPower(0);
+//        }
+
+        if (!intake){
+            intake1.setPower(0);
+            intake2.setPower(0);
         }
 
         if (gamepad2.right_trigger >= 0.5) {

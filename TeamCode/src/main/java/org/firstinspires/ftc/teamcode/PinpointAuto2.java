@@ -25,14 +25,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -65,10 +62,10 @@ For support, contact tech@gobilda.com
 -Ethan Doak
  */
 
-@Autonomous(name="auto test", group="Linear OpMode")
+@Autonomous(name="auto test THIS ONE", group="Linear OpMode")
 //@Disabled
 
-public class PinpointAuto extends LinearOpMode {
+public class PinpointAuto2 extends LinearOpMode {
 
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
 
@@ -224,13 +221,14 @@ public class PinpointAuto extends LinearOpMode {
                 String velocity = String.format(Locale.US, "{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
                 telemetry.addData("Velocity", velocity);
 
-                intake2.setPower(-INTAKE_PWR*.5);
-                intake1.setPower(INTAKE_PWR*.5);
-                while (pos.getX(DistanceUnit.INCH) < 50) {
+//                intake2.setPower(-INTAKE_PWR*.5);
+//                intake1.setPower(INTAKE_PWR*.5);
+                //strafe left
+                while (pos.getY(DistanceUnit.INCH) < 50) {
 
-                    lf.setPower(.4);
+                    lf.setPower(-.4);
                     lb.setPower(.4);
-                    rb.setPower(.4);
+                    rb.setPower(-.4);
                     rf.setPower(.4);
                     odo.update();
                     pos = odo.getPosition();
@@ -246,27 +244,25 @@ public class PinpointAuto extends LinearOpMode {
                 rb.setPower(0);
                 rf.setPower(0);
 //                forwardDrive(.3, 155, pos.getX(DistanceUnit.INCH));
-                if(pos.getX(DistanceUnit.INCH) >=38&& runtime.seconds()<7.0) {
+                if(pos.getY(DistanceUnit.INCH) >=48&& runtime.seconds()<6.0) {
                     pos = odo.getPosition();
                     telemetry.addData("test: ", pos.getX(DistanceUnit.INCH));
                     telemetry.addData("secs: ", runtime.seconds());
 
                     telemetry.update();
-                    wrist1.setPosition(WRIST1_DOWN);
-                    intake2.setPower(1);
-                    intake1.setPower(-1);
-                    sleep(5000);
+                    lf.setPower(.3);
+                    lb.setPower(.3);
+                    rb.setPower(.3);
+                    rf.setPower(.3);
+                    sleep(4000);
 
                 }
-                wrist1.setPosition(WRIST1_UP);
-                intake2.setPower(0);
-                intake1.setPower(0);
                 //straferight
                 while (pos.getX(DistanceUnit.INCH)>36) {
-                    lf.setPower(-.3);
-                    lb.setPower(-.3);
-                    rb.setPower(-.3);
-                    rf.setPower(-.3);
+                    lf.setPower(.4);
+                    lb.setPower(-.4);
+                    rb.setPower(.4);
+                    rf.setPower(-.4);
                     pos = odo.getPosition();
                     telemetry.addData("backing up, pos: ", pos.getX(DistanceUnit.INCH));
                     telemetry.addData("secs: ", runtime.seconds());

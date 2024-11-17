@@ -25,14 +25,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -65,10 +62,10 @@ For support, contact tech@gobilda.com
 -Ethan Doak
  */
 
-@Autonomous(name="auto test", group="Linear OpMode")
+@Autonomous(name="auto PARK", group="Linear OpMode")
 //@Disabled
 
-public class PinpointAuto extends LinearOpMode {
+public class AUTOPARK extends LinearOpMode {
 
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
 
@@ -100,50 +97,6 @@ public class PinpointAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-
-        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
-
-        /*
-        Set the odometry pod positions relative to the point that the odometry computer tracks around.
-        The X pod offset refers to how far sideways from the tracking point the
-        X (forward) odometry pod is. Left of the center is a positive number,
-        right of center is a negative number. the Y pod offset refers to how far forwards from
-        the tracking point the Y (strafe) odometry pod is. forward of center is a positive number,
-        backwards is a negative number.
-         */
-        odo.setOffsets(-80.0, 162.5); //these are tuned for 3110-0002-0001 Product Insight #1
-
-        /*
-        Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
-        the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
-        If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
-        number of ticks per mm of your odometry pod.
-         */
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //odo.setEncoderResolution(13.26291192);
-
-
-        /*
-        Set the direction that each of the two odometry pods count. The X (forward) pod should
-        increase when you move the robot forward. And the Y (strafe) pod should increase when
-        you move the robot to the left.
-         */
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
-
-
-        /*
-        Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
-        The IMU will automatically calibrate when first powered on, but recalibrating before running
-        the robot is a good idea to ensure that the calibration is "good".
-        resetPosAndIMU will reset the position to 0,0,0 and also recalibrate the IMU.
-        This is recommended before you run your autonomous, as a bad initial calibration can cause
-        an incorrect starting value for x, y, and heading.
-         */
-//        odo.recalibrateIMU();
-        odo.resetPosAndIMU();
-
         double startTime = System.currentTimeMillis();
 
         // Initialize the drive system variables.
@@ -152,18 +105,10 @@ public class PinpointAuto extends LinearOpMode {
         rf = hardwareMap.get(DcMotor.class, "rightFront");
         rb = hardwareMap.get(DcMotor.class, "rightBack");
 
-        intake1 = hardwareMap.get(CRServo.class, "intake1");
-        intake2 = hardwareMap.get(CRServo.class, "intake2");
-        wrist1 = hardwareMap.get(Servo.class, "wrist1");
-        wrist2 = hardwareMap.get(Servo.class, "wrist2");
-        shoulder1 = hardwareMap.get(Servo.class, "shoulder1");
-        shoulder2 = hardwareMap.get(Servo.class, "shoulder2");
-
         lf.setDirection(DcMotor.Direction.REVERSE);
         lb.setDirection(DcMotor.Direction.REVERSE);
         rf.setDirection(DcMotor.Direction.FORWARD);
         rb.setDirection(DcMotor.Direction.FORWARD);
-
 
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -173,8 +118,6 @@ public class PinpointAuto extends LinearOpMode {
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
 
-        intake2.setPower(0);
-        intake1.setPower(-0);
 
         // Send telemetry message to indicate successful Encoder reset
 
@@ -198,84 +141,12 @@ public class PinpointAuto extends LinearOpMode {
             // run until the end of the match (driver presses STOP)
             while (opModeIsActive()) {
 
-            /*
-            Request an update from the Pinpoint odometry computer. This checks almost all outputs
-            from the device in a single I2C read.
-             */
-                odo.update();
 
-                double newTime = getRuntime();
-                double loopTime = newTime - oldTime;
-                double frequency = 1 / loopTime;
-                oldTime = newTime;
-
-
-            /*
-            gets the current Position (x & y in mm, and heading in degrees) of the robot, and prints it.
-             */
-                Pose2D pos = odo.getPosition();
-                String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-                telemetry.addData("Position", data);
-
-            /*
-            gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
-             */
-                Pose2D vel = odo.getVelocity();
-                String velocity = String.format(Locale.US, "{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
-                telemetry.addData("Velocity", velocity);
-
-                intake2.setPower(-INTAKE_PWR*.5);
-                intake1.setPower(INTAKE_PWR*.5);
-                while (pos.getX(DistanceUnit.INCH) < 50) {
-
-                    lf.setPower(.4);
-                    lb.setPower(.4);
-                    rb.setPower(.4);
-                    rf.setPower(.4);
-                    odo.update();
-                    pos = odo.getPosition();
-
-                    telemetry.addData("position: ", pos.getX(DistanceUnit.INCH));
-                    telemetry.update();
-
-                }
-
-                //STRAFELEFT THEN FORWARD THEN RIGHT THEN BACK
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
-//                forwardDrive(.3, 155, pos.getX(DistanceUnit.INCH));
-                if(pos.getX(DistanceUnit.INCH) >=38&& runtime.seconds()<7.0) {
-                    pos = odo.getPosition();
-                    telemetry.addData("test: ", pos.getX(DistanceUnit.INCH));
-                    telemetry.addData("secs: ", runtime.seconds());
-
-                    telemetry.update();
-                    wrist1.setPosition(WRIST1_DOWN);
-                    intake2.setPower(1);
-                    intake1.setPower(-1);
-                    sleep(5000);
-
-                }
-                wrist1.setPosition(WRIST1_UP);
-                intake2.setPower(0);
-                intake1.setPower(0);
-                //straferight
-                while (pos.getX(DistanceUnit.INCH)>36) {
-                    lf.setPower(-.3);
-                    lb.setPower(-.3);
-                    rb.setPower(-.3);
-                    rf.setPower(-.3);
-                    pos = odo.getPosition();
-                    telemetry.addData("backing up, pos: ", pos.getX(DistanceUnit.INCH));
-                    telemetry.addData("secs: ", runtime.seconds());
-                }
-                //strafeleft
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
+                lf.setPower(-.3);
+                lb.setPower(-.3);
+                rb.setPower(-.3);
+                rf.setPower(-.3);
+            }
 
 
 //                forwardDrive(-.8, 10, pos.getX(DistanceUnit.INCH));
@@ -306,9 +177,8 @@ public class PinpointAuto extends LinearOpMode {
 
                 telemetry.addData("Pinpoint Frequency", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
 
-                telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
                 telemetry.update();
-            }
+
         }
     }
             public void forwardDrive(double power, double position, double pos) {
