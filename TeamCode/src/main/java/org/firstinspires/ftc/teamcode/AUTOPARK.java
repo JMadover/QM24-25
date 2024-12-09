@@ -115,8 +115,8 @@ public class AUTOPARK extends LinearOpMode {
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        wrist1.setPosition(WRIST1_UP);
-        wrist2.setPosition(WRIST2_UP);
+//        wrist1.setPosition(WRIST1_UP);
+//        wrist2.setPosition(WRIST2_UP);
 
 
         // Send telemetry message to indicate successful Encoder reset
@@ -124,13 +124,13 @@ public class AUTOPARK extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        while (opModeIsActive()) {
+        while (opModeIsActive() && runtime.seconds()<10) {
 
-            telemetry.addData("Status", "Initialized");
-            telemetry.addData("X offset", odo.getXOffset());
-            telemetry.addData("Y offset", odo.getYOffset());
-            telemetry.addData("Device Version Number:", odo.getDeviceVersion());
-            telemetry.addData("Device Scalar", odo.getYawScalar());
+            telemetry.addData("Status", runtime.seconds());
+//            telemetry.addData("X offset", odo.getXOffset());
+//            telemetry.addData("Y offset", odo.getYOffset());
+//            telemetry.addData("Device Version Number:", odo.getDeviceVersion());
+//            telemetry.addData("Device Scalar", odo.getYawScalar());
             telemetry.update();
 
             // Wait for the game to start (driver presses START)
@@ -173,9 +173,9 @@ public class AUTOPARK extends LinearOpMode {
             FAULT_X_POD_NOT_DETECTED - The device does not detect an X pod plugged in
             FAULT_Y_POD_NOT_DETECTED - The device does not detect a Y pod plugged in
             */
-                telemetry.addData("Status", odo.getDeviceStatus());
-
-                telemetry.addData("Pinpoint Frequency", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
+//                telemetry.addData("Status", odo.getDeviceStatus());
+//
+//                telemetry.addData("Pinpoint Frequency", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
 
                 telemetry.update();
 

@@ -46,8 +46,8 @@ public class servoTest extends OpMode
 //    static final double SERVO_CLAW_GRAB = .55;
 //
 //
-    double spos1 = servo1.getPosition();
-    double spos2 = servo2.getPosition();
+//    double spos1 = servo1.getPosition();
+//    double spos2 = servo2.getPosition();
 //    /*
 //     * Code to run ONCE when the driver hits INIT
 //     */
@@ -126,16 +126,37 @@ public class servoTest extends OpMode
     @Override
     public void loop() {
 
-        if(gamepad1.a){
-            servo1.setPosition(spos1 + 0.5);
-            servo2.setPosition(spos2 + 0.5);
+//        if(gamepad1.a) {
+//            servo1.setPosition(.12); //wrist2 DOWN
+//        }
+//        if(gamepad1.b) {
+//            servo1.setPosition(.6);
+//        }
+//        if(gamepad1.x) {
+//            servo1.setPosition(.3);
+//        }
 
+//INTUP
+        if(gamepad2.a) {
+            servo1.setPosition(.15);
         }
-        if(gamepad1.b){
-            servo1.setPosition(spos1 - 0.5);
-            servo2.setPosition(spos2 - 0.5);
+        if(gamepad2.b) {
+            servo1.setPosition(.82); //down
+        }
+        if(gamepad2.x) {
+            servo1.setPosition(.5);
+        }
 
-        }
+//        if(gamepad1.a){
+//            servo1.setPosition(spos1 + 0.5);
+//            servo2.setPosition(spos2 + 0.5);
+//
+//        }
+//        if(gamepad1.b){
+//            servo1.setPosition(spos1 - 0.5);
+//            servo2.setPosition(spos2 - 0.5);
+//
+//        }
         // Tank Mode uses one stick to control each wheel.
         // - This requires no math, but it is hard to drive forward slowly and keep straight.
         // leftPower  = -gamepad1.left_stick_y ;
@@ -145,8 +166,8 @@ public class servoTest extends OpMode
 
 
         // Show the elapsed game time and wheel power.
-        telemetry.addData("servo 1:", spos1);
-        telemetry.addData("servo 2:", spos2);
+//        telemetry.addData("servo 1:", spos1);
+//        telemetry.addData("servo 2:", spos2);
 
         telemetry.update();
 //        telemetry.addData("servo", "gamepad1.x")

@@ -244,7 +244,7 @@ public class PinpointAuto2 extends LinearOpMode {
                 rb.setPower(0);
                 rf.setPower(0);
 //                forwardDrive(.3, 155, pos.getX(DistanceUnit.INCH));
-                if(pos.getY(DistanceUnit.INCH) >=48&& runtime.seconds()<6.0) {
+                if(pos.getY(DistanceUnit.INCH) >=48&& runtime.seconds()<5.0) {
                     pos = odo.getPosition();
                     telemetry.addData("test: ", pos.getX(DistanceUnit.INCH));
                     telemetry.addData("secs: ", runtime.seconds());

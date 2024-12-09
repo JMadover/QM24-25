@@ -29,11 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.iterativeTest.SLIDES_MAX;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -65,9 +66,9 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 
-@TeleOp(name="Driver Control")
+@TeleOp(name="Driver Control no slides")
 
-public class iterativeTest extends OpMode {
+public class iterativeTestnoSlides extends OpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -76,32 +77,45 @@ public class iterativeTest extends OpMode {
     private DcMotor rf = null;
     private DcMotor rb = null;
     private DcMotor lift = null;
-    private DcMotor reach = null;
+//    private DcMotor reach = null;
 
-    private CRServo intake1 = null; //port 5 control hub.
     private CRServo intake2 = null; //port 0 exp hub.
-    private Servo wrist1 = null; //port 1 expansion hub. right
-    private Servo wrist2 = null; //port 4 control hub. left
+    private Servo wrist1 = null; //port 4 control hub. left
+    private Servo intup1 = null; //port 3 control hub. left
+    private Servo claw = null;
+
+    private Servo slides1 = null; //control 0 control hub
+    private Servo intup2 = null; //port 1 control hub. right
     private Servo shoulder1 = null; //port 2 control hub. right
     private Servo shoulder2 = null; //port 3 control hub. left
+    private CRServo intake1 = null; //port 4 control hub.
+    private Servo wrist2 = null; //port 5 control hub
 
-    static final double WRIST1_DOWN = 0.3;
-    static final double WRIST1_UP = 0.9;
+
+    static final double WRIST1_DOWN = .28;
+    static final double WRIST1_UP = .6;
 
     //TODO: FIND POSITIONS wrist 2
-    static final double WRIST2_DOWN = 0.475;
-    static final double WRIST2_UP = .05;
+    static final double WRIST2_DOWN = .23;
+    static final double WRIST2_UP = .6;
 
     static final double INTAKE_PWR = 0.95;
 
     static final double SHOULDER1_DOWN = .7; //1
     static final double SHOULDER1_UP = .1;
 
-    static final double SHOULDER2_DOWN = 0.35;
-    static final double SHOULDER2_UP = 1;
+    static final double SHOULDER2_DOWN = 0.75;
+    static final double SHOULDER2_UP = .95;
 
-    //TODO: ENCODERS FOR SLIDES - reach and lift
-    static final double SLIDES_MAX = 0.7;
+    static final double INT_UP = .15;
+    static final double INT_DOWN = .8;
+
+    static final double CLAW_IN = .72;
+    static final double CLAW_OUT = .9;
+
+    static final double SLIDES_IN = .15;
+    static final double SLIDES_OUT = .82;
+
 
     IMU imu;
 
@@ -116,8 +130,8 @@ public class iterativeTest extends OpMode {
         rf = hardwareMap.get(DcMotor.class, "rightFront");
         rb = hardwareMap.get(DcMotor.class, "rightBack");
         imu = hardwareMap.get(IMU.class, "imu");
-        lift = hardwareMap.get(DcMotor.class, "lift");
-        reach = hardwareMap.get(DcMotor.class, "reach");
+//        lift = hardwareMap.get(DcMotor.class, "lift");
+//        reach = hardwareMap.get(DcMotor.class, "reach");
         //dave = hardwareMap.get(DcMotor.class, "dave");
         intake1 = hardwareMap.get(CRServo.class, "intake1");
         intake2 = hardwareMap.get(CRServo.class, "intake2");
@@ -125,6 +139,13 @@ public class iterativeTest extends OpMode {
         wrist2 = hardwareMap.get(Servo.class, "wrist2");
         shoulder1 = hardwareMap.get(Servo.class, "shoulder1");
         shoulder2 = hardwareMap.get(Servo.class, "shoulder2");
+
+        claw = hardwareMap.get(Servo.class, "claw");
+
+        intup1 = hardwareMap.get(Servo.class, "intup1");
+        intup2 = hardwareMap.get(Servo.class, "intup2");
+        slides1 = hardwareMap.get(Servo.class, "slides1");
+
 
 //        lf.setDirection(DcMotor.Direction.REVERSE);
 //        lb.setDirection(DcMotor.Direction.REVERSE);
@@ -134,14 +155,14 @@ public class iterativeTest extends OpMode {
         lb.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.FORWARD);
         rb.setDirection(DcMotor.Direction.FORWARD);
-        lift.setDirection(DcMotor.Direction.FORWARD);
-        reach.setDirection(DcMotor.Direction.FORWARD);
+//        lift.setDirection(DcMotor.Direction.FORWARD);
+//        reach.setDirection(DcMotor.Direction.FORWARD);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        reach.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        reach.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
@@ -228,16 +249,16 @@ public class iterativeTest extends OpMode {
             rightBackPower = 0.4;
         }
 
-        if(gamepad2.left_stick_y <0) {
-            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-        } else{
-            lift.setPower(gamepad2.left_stick_y * .25);
-        }
-        if(gamepad2.right_stick_y <0){
-            reach.setPower(-gamepad2.right_stick_y * 7);
-        } else {
-            reach.setPower(-gamepad2.right_stick_y * 25);
-        }
+//        if(gamepad2.left_stick_y <0) {
+//            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+//        } else{
+//            lift.setPower(gamepad2.left_stick_y * .25);
+//        }
+//        if(gamepad2.right_stick_y <0){
+//            reach.setPower(-gamepad2.right_stick_y * 7);
+//        } else {
+//            reach.setPower(-gamepad2.right_stick_y * 25);
+//        }
 
 
         boolean in = false;
@@ -289,6 +310,17 @@ public class iterativeTest extends OpMode {
 //            lift.setPower(0);
 //        }
 
+        if (gamepad2.x) {
+            //intup up
+            intup1.setPosition(INT_UP);
+            intup2.setPosition(INT_UP);
+        }
+        if (gamepad2.y) {
+            //intup down
+            intup1.setPosition(INT_DOWN);
+            intup2.setPosition(INT_DOWN);
+        }
+
         if (!intake){
             intake1.setPower(0);
             intake2.setPower(0);
@@ -304,6 +336,20 @@ public class iterativeTest extends OpMode {
             //shoulder up
             shoulder1.setPosition(SHOULDER1_UP);
             shoulder2.setPosition(SHOULDER2_UP);
+        }
+
+        if (gamepad1.a){
+            slides1.setPosition(SLIDES_IN);
+        }
+        if (gamepad1.b){
+            slides1.setPosition(SLIDES_OUT);
+        }
+
+        if (gamepad1.x){
+            claw.setPosition(CLAW_IN);
+        }
+        if (gamepad1.y){
+            claw.setPosition(CLAW_OUT);
         }
 
         double maxSpeed = .9;
