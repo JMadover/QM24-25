@@ -92,29 +92,29 @@ public class iterativeTestnoSlides extends OpMode {
     private Servo wrist2 = null; //port 5 control hub
 
 
-    static final double WRIST1_DOWN = .28;
-    static final double WRIST1_UP = .6;
+    static final double WRIST1_DOWN = .65;
+    static final double WRIST1_UP = .99;
 
     //TODO: FIND POSITIONS wrist 2
-    static final double WRIST2_DOWN = .23;
-    static final double WRIST2_UP = .6;
+    static final double WRIST2_DOWN = .65;
+    static final double WRIST2_UP = .99;
 
     static final double INTAKE_PWR = 0.95;
 
-    static final double SHOULDER1_DOWN = .7; //1
-    static final double SHOULDER1_UP = .1;
+    static final double SHOULDER1_DOWN = .52; //1
+    static final double SHOULDER1_UP = .02;
 
-    static final double SHOULDER2_DOWN = 0.75;
-    static final double SHOULDER2_UP = .95;
+    static final double SHOULDER2_DOWN = 0.72;
+    static final double SHOULDER2_UP = .99;
 
     static final double INT_UP = .15;
-    static final double INT_DOWN = .8;
+    static final double INT_DOWN = .75;
 
-    static final double CLAW_IN = .72;
-    static final double CLAW_OUT = .9;
+    static final double CLAW_IN = .38;
+    static final double CLAW_OUT = .7;
 
-    static final double SLIDES_IN = .15;
-    static final double SLIDES_OUT = .82;
+    static final double SLIDES_IN = .05;
+    static final double SLIDES_OUT = .87    ;
 
 
     IMU imu;
@@ -130,7 +130,7 @@ public class iterativeTestnoSlides extends OpMode {
         rf = hardwareMap.get(DcMotor.class, "rightFront");
         rb = hardwareMap.get(DcMotor.class, "rightBack");
         imu = hardwareMap.get(IMU.class, "imu");
-//        lift = hardwareMap.get(DcMotor.class, "lift");
+        lift = hardwareMap.get(DcMotor.class, "lift");
 //        reach = hardwareMap.get(DcMotor.class, "reach");
         //dave = hardwareMap.get(DcMotor.class, "dave");
         intake1 = hardwareMap.get(CRServo.class, "intake1");
@@ -155,13 +155,13 @@ public class iterativeTestnoSlides extends OpMode {
         lb.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.FORWARD);
         rb.setDirection(DcMotor.Direction.FORWARD);
-//        lift.setDirection(DcMotor.Direction.FORWARD);
+        lift.setDirection(DcMotor.Direction.FORWARD);
 //        reach.setDirection(DcMotor.Direction.FORWARD);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        reach.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         wrist1.setPosition(WRIST1_UP);
@@ -249,11 +249,11 @@ public class iterativeTestnoSlides extends OpMode {
             rightBackPower = 0.4;
         }
 
-//        if(gamepad2.left_stick_y <0) {
-//            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-//        } else{
-//            lift.setPower(gamepad2.left_stick_y * .25);
-//        }
+        if(gamepad2.left_stick_y <0) {
+            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+        } else{
+            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+        }
 //        if(gamepad2.right_stick_y <0){
 //            reach.setPower(-gamepad2.right_stick_y * 7);
 //        } else {
@@ -294,7 +294,7 @@ public class iterativeTestnoSlides extends OpMode {
 
         if (gamepad2.left_bumper) {
             //wrist moving up, intake goes on to keep block in
-            intake = true;
+//            intake = true;
             intake1.setPower(INTAKE_PWR);
             intake2.setPower(-INTAKE_PWR);
             wrist1.setPosition(WRIST1_UP);
