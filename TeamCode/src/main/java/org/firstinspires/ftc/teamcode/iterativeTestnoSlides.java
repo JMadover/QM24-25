@@ -81,7 +81,7 @@ public class iterativeTestnoSlides extends OpMode {
 
     private CRServo intake2 = null; //port 0 exp hub.
     private Servo wrist1 = null; //port 4 control hub. left
-    private Servo intup1 = null; //port 3 control hub. left
+    private Servo intup1 = null; //port 3 expansion hub. left
     private Servo claw = null;
 
     private Servo slides1 = null; //control 0 control hub
@@ -101,20 +101,25 @@ public class iterativeTestnoSlides extends OpMode {
 
     static final double INTAKE_PWR = 0.95;
 
-    static final double SHOULDER1_DOWN = .52; //1
-    static final double SHOULDER1_UP = .02;
+    static final double SHOULDER1_DOWN = .55; //1
+    static final double SHOULDER1_UP = .22;
+//    static final double SHOULDER1_UP = .001;
 
-    static final double SHOULDER2_DOWN = 0.72;
-    static final double SHOULDER2_UP = .99;
+    static final double SHOULDER2_DOWN = 0.43;
+    static final double SHOULDER2_UP = .76;
+//    static final double SHOULDER2_UP = .99;
 
     static final double INT_UP = .15;
-    static final double INT_DOWN = .75;
+    static final double INT_DOWN = .65;
 
-    static final double CLAW_IN = .38;
+    static final double INT_UP1 = .97;
+    static final double INT_DOWN1 = .31;
+
+    static final double CLAW_IN = .53;
     static final double CLAW_OUT = .7;
 
-    static final double SLIDES_IN = .05;
-    static final double SLIDES_OUT = .87    ;
+    static final double SLIDES_OUT = .05;
+    static final double SLIDES_IN = .79    ;
 
 
     IMU imu;
@@ -312,12 +317,12 @@ public class iterativeTestnoSlides extends OpMode {
 
         if (gamepad2.x) {
             //intup up
-            intup1.setPosition(INT_UP);
+            intup1.setPosition(INT_UP1);
             intup2.setPosition(INT_UP);
         }
         if (gamepad2.y) {
             //intup down
-            intup1.setPosition(INT_DOWN);
+            intup1.setPosition(INT_DOWN1);
             intup2.setPosition(INT_DOWN);
         }
 
@@ -361,7 +366,7 @@ public class iterativeTestnoSlides extends OpMode {
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Quantum on top", '#' + 1);
+        telemetry.addData("Quantum on top", intup1.getPosition());
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
         telemetry.update();
