@@ -40,6 +40,17 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.View;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
+
 /*
  * This file contains an example of an "OpMode".
  * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
@@ -121,6 +132,9 @@ public class iterativeTestnoSlides extends OpMode {
     static final double SLIDES_OUT = .05;
     static final double SLIDES_IN = .79    ;
 
+    NormalizedColorSensor colorSensor;
+
+
 
     IMU imu;
 
@@ -150,6 +164,8 @@ public class iterativeTestnoSlides extends OpMode {
         intup1 = hardwareMap.get(Servo.class, "intup1");
         intup2 = hardwareMap.get(Servo.class, "intup2");
         slides1 = hardwareMap.get(Servo.class, "slides1");
+
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
 
 
 //        lf.setDirection(DcMotor.Direction.REVERSE);
@@ -264,6 +280,8 @@ public class iterativeTestnoSlides extends OpMode {
 //        } else {
 //            reach.setPower(-gamepad2.right_stick_y * 25);
 //        }
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        colorSensor.setGain(2);
 
 
         boolean in = false;
@@ -283,6 +301,12 @@ public class iterativeTestnoSlides extends OpMode {
                 intake = true;
             } else {
                 intake = false;
+            }
+            if (colors.blue > 0.5) {
+                intake = true;
+                in = false;
+                intake2.setPower(INTAKE_PWR);
+                intake1.setPower(-INTAKE_PWR);
             }
         }
 
@@ -369,6 +393,9 @@ public class iterativeTestnoSlides extends OpMode {
         telemetry.addData("Quantum on top", intup1.getPosition());
         telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
         telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+        telemetry.addLine()
+                .addData("Red", "%.3f", colors.red)
+                .addData("Blue", "%.3f", colors.blue);
         telemetry.update();
     }
 }
