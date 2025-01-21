@@ -35,21 +35,14 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 /*
  * This file contains an example of an "OpMode".
@@ -87,17 +80,18 @@ public class iterativeTestnoSlides extends OpMode {
     private DcMotor lb = null;
     private DcMotor rf = null;
     private DcMotor rb = null;
-    private DcMotor lift = null;
+    private DcMotor slide1 = null;
+    private DcMotor slide2 = null;
 //    private DcMotor reach = null;
 
     private CRServo intake2 = null; //port 0 exp hub.
-    private Servo wrist1 = null; //port 4 control hub. left
+    private Servo shoulder1 = null; //port 1 exp hub. right
+    private Servo wrist1 = null; //not being used port 2
     private Servo intup1 = null; //port 3 expansion hub. left
-    private Servo claw = null;
+    private Servo claw = null; // port 5 exp
 
-    private Servo slides1 = null; //control 0 control hub
+    private Servo reach = null; //control 0 control hub
     private Servo intup2 = null; //port 1 control hub. right
-    private Servo shoulder1 = null; //port 2 control hub. right
     private Servo shoulder2 = null; //port 3 control hub. left
     private CRServo intake1 = null; //port 4 control hub.
     private Servo wrist2 = null; //port 5 control hub
@@ -126,8 +120,8 @@ public class iterativeTestnoSlides extends OpMode {
     static final double INT_UP1 = .97;
     static final double INT_DOWN1 = .31;
 
-    static final double CLAW_IN = .53;
-    static final double CLAW_OUT = .7;
+    static final double CLAW_IN = .9;
+    static final double CLAW_OUT = .4;
 
     static final double SLIDES_OUT = .05;
     static final double SLIDES_IN = .79    ;
@@ -149,8 +143,8 @@ public class iterativeTestnoSlides extends OpMode {
         rf = hardwareMap.get(DcMotor.class, "rightFront");
         rb = hardwareMap.get(DcMotor.class, "rightBack");
         imu = hardwareMap.get(IMU.class, "imu");
-        lift = hardwareMap.get(DcMotor.class, "lift");
-//        reach = hardwareMap.get(DcMotor.class, "reach");
+        slide1 = hardwareMap.get(DcMotor.class, "slide1");
+        slide2 = hardwareMap.get(DcMotor.class, "slide1");
         //dave = hardwareMap.get(DcMotor.class, "dave");
         intake1 = hardwareMap.get(CRServo.class, "intake1");
         intake2 = hardwareMap.get(CRServo.class, "intake2");
@@ -163,7 +157,7 @@ public class iterativeTestnoSlides extends OpMode {
 
         intup1 = hardwareMap.get(Servo.class, "intup1");
         intup2 = hardwareMap.get(Servo.class, "intup2");
-        slides1 = hardwareMap.get(Servo.class, "slides1");
+        reach = hardwareMap.get(Servo.class, "reach");
 
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
 
@@ -176,13 +170,15 @@ public class iterativeTestnoSlides extends OpMode {
         lb.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.FORWARD);
         rb.setDirection(DcMotor.Direction.FORWARD);
-        lift.setDirection(DcMotor.Direction.FORWARD);
+        slide1.setDirection(DcMotor.Direction.FORWARD);
+        slide2.setDirection(DcMotor.Direction.REVERSE);
 //        reach.setDirection(DcMotor.Direction.FORWARD);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        reach.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         wrist1.setPosition(WRIST1_UP);
@@ -271,9 +267,12 @@ public class iterativeTestnoSlides extends OpMode {
         }
 
         if(gamepad2.left_stick_y <0) {
-            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+            slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+            slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
         } else{
-            lift.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+            slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+            slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+
         }
 //        if(gamepad2.right_stick_y <0){
 //            reach.setPower(-gamepad2.right_stick_y * 7);
@@ -368,10 +367,10 @@ public class iterativeTestnoSlides extends OpMode {
         }
 
         if (gamepad1.a){
-            slides1.setPosition(SLIDES_IN);
+            reach.setPosition(SLIDES_IN);
         }
         if (gamepad1.b){
-            slides1.setPosition(SLIDES_OUT);
+            reach.setPosition(SLIDES_OUT);
         }
 
         if (gamepad1.x){
