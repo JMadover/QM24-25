@@ -101,24 +101,24 @@ public class iterativeTestnoSlides extends OpMode {
     static final double WRIST1_UP = .99;
 
     //TODO: FIND POSITIONS wrist 2
-    static final double WRIST2_DOWN = .65;
-    static final double WRIST2_UP = .99;
+    static final double WRIST2_DOWN = .01;
+    static final double WRIST2_UP = .5;
 
     static final double INTAKE_PWR = 0.95;
 
-    static final double SHOULDER1_DOWN = .55; //1
-    static final double SHOULDER1_UP = .22;
+    static final double SHOULDER1_DOWN = .39; //1
+    static final double SHOULDER1_UP = .02;
 //    static final double SHOULDER1_UP = .001;
 
-    static final double SHOULDER2_DOWN = 0.43;
-    static final double SHOULDER2_UP = .76;
+    static final double SHOULDER2_DOWN = 0.5;
+    static final double SHOULDER2_UP = .96;
 //    static final double SHOULDER2_UP = .99;
 
-    static final double INT_UP = .15;
-    static final double INT_DOWN = .65;
+    static final double INT_UP = .45;
+    static final double INT_DOWN = .9;
 
-    static final double INT_UP1 = .97;
-    static final double INT_DOWN1 = .31;
+    static final double INT_UP1 = .55;
+    static final double INT_DOWN1 = .1;
 
     static final double CLAW_IN = .9;
     static final double CLAW_OUT = .4;
@@ -266,14 +266,14 @@ public class iterativeTestnoSlides extends OpMode {
             rightBackPower = 0.4;
         }
 
-        if(gamepad2.left_stick_y <0) {
+//        if(gamepad2.left_stick_y <0) {
             slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
             slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-        } else{
-            slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-            slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+//        } else{
+//            slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+//            slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
 
-        }
+//        }
 //        if(gamepad2.right_stick_y <0){
 //            reach.setPower(-gamepad2.right_stick_y * 7);
 //        } else {
