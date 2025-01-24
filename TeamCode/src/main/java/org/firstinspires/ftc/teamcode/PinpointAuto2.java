@@ -23,12 +23,18 @@ package org.firstinspires.ftc.teamcode;
  */
 
 
+import static org.firstinspires.ftc.teamcode.Constants.*;
+import static org.firstinspires.ftc.teamcode.Utils.*;
+
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -77,22 +83,25 @@ public class PinpointAuto2 extends LinearOpMode {
     private DcMotor lb = null;
     private DcMotor rf = null;
     private DcMotor rb = null;
+    private DcMotor slide1 = null;
+    private DcMotor slide2 = null;
+    IMU imu;
 
-    private CRServo intake1 = null; //port 5 control hub.
     private CRServo intake2 = null; //port 0 exp hub.
-    private Servo wrist1 = null; //port 1 expansion hub. right
-    private Servo wrist2 = null; //port 4 control hub. left
-    private Servo shoulder1 = null; //port 2 control hub. right
+    private Servo shoulder1 = null; //port 1 exp hub. right
+    private Servo wrist1 = null; //not being used port 2
+    private Servo intup1 = null; //port 3 expansion hub. left
+    private Servo claw = null; // port 5 exp
+
+    private Servo reach = null; //control 0 control hub
+    private Servo intup2 = null; //port 1 control hub. right
     private Servo shoulder2 = null; //port 3 control hub. left
-    static final double WRIST1_DOWN = .75;
-    static final double WRIST1_UP = 0.2;
+    private CRServo intake1 = null; //port 4 control hub.
+    private Servo wrist2 = null; //port 5 control hub
 
-    //TODO: FIND POSITIONS wrist 2
-    static final double WRIST2_DOWN = 0.675;
-    static final double WRIST2_UP = 0.2;
-
-    static final double INTAKE_PWR = 0.95;
-
+    public enum Direction {
+        F, L, R
+    }
 
     @Override
     public void runOpMode() {
@@ -148,7 +157,9 @@ public class PinpointAuto2 extends LinearOpMode {
         lb = hardwareMap.get(DcMotor.class, "leftBack");
         rf = hardwareMap.get(DcMotor.class, "rightFront");
         rb = hardwareMap.get(DcMotor.class, "rightBack");
-
+        imu = hardwareMap.get(IMU.class, "imu");
+        slide1 = hardwareMap.get(DcMotor.class, "slide1");
+        slide2 = hardwareMap.get(DcMotor.class, "slide2");
         intake1 = hardwareMap.get(CRServo.class, "intake1");
         intake2 = hardwareMap.get(CRServo.class, "intake2");
         wrist1 = hardwareMap.get(Servo.class, "wrist1");
@@ -156,16 +167,26 @@ public class PinpointAuto2 extends LinearOpMode {
         shoulder1 = hardwareMap.get(Servo.class, "shoulder1");
         shoulder2 = hardwareMap.get(Servo.class, "shoulder2");
 
+        claw = hardwareMap.get(Servo.class, "claw");
+
+        intup1 = hardwareMap.get(Servo.class, "intup1");
+        intup2 = hardwareMap.get(Servo.class, "intup2");
+        reach = hardwareMap.get(Servo.class, "reach");
+
         lf.setDirection(DcMotor.Direction.REVERSE);
         lb.setDirection(DcMotor.Direction.REVERSE);
         rf.setDirection(DcMotor.Direction.FORWARD);
         rb.setDirection(DcMotor.Direction.FORWARD);
 
+        slide1.setDirection(DcMotor.Direction.FORWARD);
+        slide2.setDirection(DcMotor.Direction.REVERSE);
 
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
@@ -221,11 +242,26 @@ public class PinpointAuto2 extends LinearOpMode {
                 String velocity = String.format(Locale.US, "{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
                 telemetry.addData("Velocity", velocity);
 
-//                intake2.setPower(-INTAKE_PWR*.5);
-//                intake1.setPower(INTAKE_PWR*.5);
                 //strafe left
-                while (pos.getY(DistanceUnit.INCH) < 50) {
+                while (pos.getX(DistanceUnit.INCH) < 10) {
+                    drive(Direction.F,-.4);
+                    pos = odo.getPosition();
 
+                    telemetry.addData("positionY: ", pos.getY(DistanceUnit.INCH));
+                    telemetry.addData("positionX: ", pos.getX(DistanceUnit.INCH));
+                    telemetry.update();
+                }
+                deposit();
+                double start = pos.getHeading(AngleUnit.DEGREES);
+                while( pos.getHeading(AngleUnit.DEGREES) - start < 90){
+                    drive(Direction.R, .5);
+                }
+                intake();
+                //turn again
+                passThru();
+                deposit();
+
+                while (pos.getY(DistanceUnit.INCH) < 10) {
                     lf.setPower(-.4);
                     lb.setPower(.4);
                     rb.setPower(-.4);
@@ -233,60 +269,11 @@ public class PinpointAuto2 extends LinearOpMode {
                     odo.update();
                     pos = odo.getPosition();
 
-                    telemetry.addData("position: ", pos.getX(DistanceUnit.INCH));
+                    telemetry.addData("positionY: ", pos.getY(DistanceUnit.INCH));
+                    telemetry.addData("positionX: ", pos.getX(DistanceUnit.INCH));
                     telemetry.update();
 
                 }
-
-                //STRAFELEFT THEN FORWARD THEN RIGHT THEN BACK
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
-//                forwardDrive(.3, 155, pos.getX(DistanceUnit.INCH));
-                if(pos.getY(DistanceUnit.INCH) >=48&& runtime.seconds()<5.0) {
-                    pos = odo.getPosition();
-                    telemetry.addData("test: ", pos.getX(DistanceUnit.INCH));
-                    telemetry.addData("secs: ", runtime.seconds());
-
-                    telemetry.update();
-                    lf.setPower(.3);
-                    lb.setPower(.3);
-                    rb.setPower(.3);
-                    rf.setPower(.3);
-                    sleep(4000);
-
-                }
-                //straferight
-                while (pos.getX(DistanceUnit.INCH)>36) {
-                    lf.setPower(.4);
-                    lb.setPower(-.4);
-                    rb.setPower(.4);
-                    rf.setPower(-.4);
-                    pos = odo.getPosition();
-                    telemetry.addData("backing up, pos: ", pos.getX(DistanceUnit.INCH));
-                    telemetry.addData("secs: ", runtime.seconds());
-                }
-                //strafeleft
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
-
-
-//                forwardDrive(-.8, 10, pos.getX(DistanceUnit.INCH));
-//                strafeLeft(-.8, 40, pos.getY(DistanceUnit.INCH)); //strafe right
-//                intake.setPower(-.8);
-//                forwardDrive(-.6, 5, pos.getX(DistanceUnit.INCH));
-//                wrist1.setPosition(WRIST1_UP);
-//                strafeLeft(.8, 40, pos.getY(DistanceUnit.INCH));
-//                wrist1.setPosition(WRIST1_DOWN);
-//                intake.setPower(.8);
-//                wrist1.setPosition(WRIST1_UP);
-//                intake.setPower(0);
-//                forwardDrive(-.8, 175, pos.getX(DistanceUnit.INCH));
-
-
 
 
             /*
@@ -307,72 +294,64 @@ public class PinpointAuto2 extends LinearOpMode {
             }
         }
     }
-            public void forwardDrive(double power, double position, double pos) {
 
-                System.out.println("in forward drive");
-
-
-
-                //wait until reaches position
-//                while (pos < position && opModeIsActive()) {
-//                    lf.setPower(power);
-//                    lb.setPower(power);
-//                    rb.setPower(power);
-//                    rf.setPower(power);
-//
-//                    odo.update();
-//
-//                    telemetry.addData("position: ", pos);
-//                    telemetry.addData("lf, lb, rb, rf", power);
-//                    telemetry.update();
-//
-//                }
-//
-//                lf.setPower(0);
-//                lb.setPower(0);
-//                rb.setPower(0);
-//                rf.setPower(0);
-            }
-
-            public void strafeLeft(double power, double position, double pos) {
-
-                rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-                rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-                System.out.println("in strafe l");
-
-                lf.setPower(-power);
-                lb.setPower(power);
-                rb.setPower(-power);
-                rf.setPower(power);
-
-                //wait until finishes turning
-                while (Math.abs(rf.getCurrentPosition()) < position && opModeIsActive()) {
-                }
-
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
-            }
-
-            public void strafeRight(double power) {
-
-                lf.setPower(power);
-                lb.setPower(-power);
-                rb.setPower(power);
-                rf.setPower(-power);
-
-                while (opModeIsActive()) {
-                }
-
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
-                //wait until finishes turning
-
-
-            }
+    public void drive(Direction dir, double power) {
+        switch (dir){
+            case F: setMotorPower(lf,lb,rf,rb,power,power,power,power);
+            case R: setMotorPower(lf,lb,rf,rb,power,power,-power,-power);
+            case L: setMotorPower(lf,lb,rf,rb,-power,-power,power,power);
+        }
+        odo.update();
     }
+
+    public void deposit() {
+        setMotorPower(lf,lb,rf,rb,0,0,0,0);
+        ElapsedTime timeTemp = new ElapsedTime();
+        while (timeTemp.seconds() < 2.5 ) {
+            slide1.setPower(SLIDES_MAX);
+        }
+        while (timeTemp.seconds()<3.5){
+            slide1.setPower(0.1);
+            shoulder1.setPosition(SHOULDER1_UP);
+            shoulder2.setPosition(SHOULDER2_UP);
+            claw.setPosition(CLAW_OUT);
+            shoulder1.setPosition(SHOULDER1_DOWN);
+            shoulder2.setPosition(SHOULDER2_DOWN);
+        }
+        while (timeTemp.seconds()<4.5){
+            slide1.setPower(-SLIDES_MAX*.8);
+        }
+    }
+
+    public void intake() {
+        setMotorPower(lf,lb,rf,rb,0,0,0,0);
+        reach.setPosition(SLIDES_OUT);
+        intup1.setPosition(INT_DOWN);
+        intup2.setPosition(INT_DOWN1);
+        intake1.setPower(INTAKE_PWR);
+        intake2.setPower(INTAKE_PWR);
+        ElapsedTime timeTemp = new ElapsedTime();
+        while (timeTemp.seconds()<.5){
+            setMotorPower(lf,lb,rf,rb,.3,0.3,0.3,0.3);
+        }
+        setMotorPower(lf,lb,rf,rb,0,0,0,0);
+        intup1.setPosition(INT_UP);
+        intup2.setPosition(INT_UP1);
+        intake1.setPower(0);
+        intake2.setPower(0);
+    }
+    public void passThru() {
+        setMotorPower(lf,lb,rf,rb,0,0,0,0);
+        wrist1.setPosition(WRIST1_DOWN);
+        wrist2.setPosition(WRIST2_DOWN);
+        reach.setPosition(SLIDES_IN);
+        claw.setPosition(CLAW_IN);
+        intake1.setPower(-INTAKE_PWR);
+        intake2.setPower(-INTAKE_PWR);
+        shoulder1.setPosition(SHOULDER1_UP);
+        shoulder2.setPosition(SHOULDER2_UP);
+        intake1.setPower(0);
+        intake2.setPower(0);
+    }
+
+}

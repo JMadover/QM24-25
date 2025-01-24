@@ -29,13 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.iterativeTest.SLIDES_MAX;
+import static org.firstinspires.ftc.teamcode.Constants.*;
+import static org.firstinspires.ftc.teamcode.Utils.*;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -70,7 +70,7 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
  */
 
 
-@TeleOp(name="Driver Control no slides")
+@TeleOp(name="iterativeTEST CURRENT")
 
 public class iterativeTestnoSlides extends OpMode {
 
@@ -95,40 +95,9 @@ public class iterativeTestnoSlides extends OpMode {
     private Servo shoulder2 = null; //port 3 control hub. left
     private CRServo intake1 = null; //port 4 control hub.
     private Servo wrist2 = null; //port 5 control hub
-
-
-    static final double WRIST1_DOWN = .65;
-    static final double WRIST1_UP = .99;
-
-    //TODO: FIND POSITIONS wrist 2
-    static final double WRIST2_DOWN = .01;
-    static final double WRIST2_UP = .5;
-
-    static final double INTAKE_PWR = 0.95;
-
-    static final double SHOULDER1_DOWN = .39; //1
-    static final double SHOULDER1_UP = .02;
-//    static final double SHOULDER1_UP = .001;
-
-    static final double SHOULDER2_DOWN = 0.5;
-    static final double SHOULDER2_UP = .96;
-//    static final double SHOULDER2_UP = .99;
-
-    static final double INT_UP = .45;
-    static final double INT_DOWN = .9;
-
-    static final double INT_UP1 = .55;
-    static final double INT_DOWN1 = .1;
-
-    static final double CLAW_IN = .9;
-    static final double CLAW_OUT = .4;
-
-    static final double SLIDES_OUT = .05;
-    static final double SLIDES_IN = .79    ;
+    ;
 
     NormalizedColorSensor colorSensor;
-
-
 
     IMU imu;
 
@@ -137,14 +106,14 @@ public class iterativeTestnoSlides extends OpMode {
     public void init() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
+        // to the names assigned during tahe robot configuration step on the DS or RC devices.
         lf = hardwareMap.get(DcMotor.class, "leftFront");
         lb = hardwareMap.get(DcMotor.class, "leftBack");
         rf = hardwareMap.get(DcMotor.class, "rightFront");
         rb = hardwareMap.get(DcMotor.class, "rightBack");
         imu = hardwareMap.get(IMU.class, "imu");
         slide1 = hardwareMap.get(DcMotor.class, "slide1");
-        slide2 = hardwareMap.get(DcMotor.class, "slide1");
+        slide2 = hardwareMap.get(DcMotor.class, "slide2");
         //dave = hardwareMap.get(DcMotor.class, "dave");
         intake1 = hardwareMap.get(CRServo.class, "intake1");
         intake2 = hardwareMap.get(CRServo.class, "intake2");
@@ -161,25 +130,18 @@ public class iterativeTestnoSlides extends OpMode {
 
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
 
-
-//        lf.setDirection(DcMotor.Direction.REVERSE);
-//        lb.setDirection(DcMotor.Direction.REVERSE);
-//        rf.setDirection(DcMotor.Direction.FORWARD);
-//        rb.setDirection(DcMotor.Direction.FORWARD);
         lf.setDirection(DcMotor.Direction.FORWARD);
         lb.setDirection(DcMotor.Direction.FORWARD);
         rf.setDirection(DcMotor.Direction.FORWARD);
         rb.setDirection(DcMotor.Direction.FORWARD);
         slide1.setDirection(DcMotor.Direction.FORWARD);
         slide2.setDirection(DcMotor.Direction.REVERSE);
-//        reach.setDirection(DcMotor.Direction.FORWARD);
         lf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        reach.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
@@ -230,58 +192,23 @@ public class iterativeTestnoSlides extends OpMode {
         rightBackPower   = Range.clip(-lx - rx + ry, -1.0, 1.0) ;
 
         if (gamepad1.dpad_down) {
-            leftFrontPower = -0.3;
-            rightFrontPower = 0.3;
-            leftBackPower = -0.3;
-            rightBackPower = 0.3;
+            setMotorPower(lf,lb,rf,rb,-.3,-.3,.3,.3);
         }
         if (gamepad1.dpad_up) {
-            leftFrontPower = 0.3;
-            rightFrontPower = -0.3;
-            leftBackPower = 0.3;
-            rightBackPower = -0.3;
+            setMotorPower(lf,lb,rf,rb,.3,.3,-.3,-.3);
         }
         if (gamepad1.dpad_right) {
-            leftFrontPower = -0.5;
-            rightFrontPower = -0.5;
-            leftBackPower = 0.5;
-            rightBackPower = 0.5;
+            setMotorPower(lf,lb,rf,rb,-.3,.3,-.3,.3);
         }
         if (gamepad1.dpad_left) {
-            leftFrontPower = 0.5;
-            rightFrontPower = 0.5;
-            leftBackPower = -0.5;
-            rightBackPower = -0.5;
-        }
-        if (gamepad1.right_bumper) {
-            leftFrontPower = 0.4;
-            rightFrontPower = -0.4;
-            leftBackPower = 0.4;
-            rightBackPower = -0.4;
-        }
-        if (gamepad1.left_bumper) {
-            leftFrontPower = -0.4;
-            rightFrontPower = 0.4;
-            leftBackPower = -0.4;
-            rightBackPower = 0.4;
+            setMotorPower(lf,lb,rf,rb,.3,-.3,.3,-.3);
         }
 
-//        if(gamepad2.left_stick_y <0) {
-            slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-            slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-//        } else{
-//            slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
-//            slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+        slide1.setPower(gamepad2.left_stick_y * SLIDES_MAX);
+        slide2.setPower(gamepad2.left_stick_y * SLIDES_MAX);
 
-//        }
-//        if(gamepad2.right_stick_y <0){
-//            reach.setPower(-gamepad2.right_stick_y * 7);
-//        } else {
-//            reach.setPower(-gamepad2.right_stick_y * 25);
-//        }
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         colorSensor.setGain(2);
-
 
         boolean in = false;
         if (gamepad2.b) {
@@ -329,15 +256,6 @@ public class iterativeTestnoSlides extends OpMode {
             wrist2.setPosition(WRIST2_UP);
         }
 
-//        if(lift.getCurrentPosition()<LIFT_MAX){
-//            //ensures vertical slides do not overextend
-//            lift.setPower(gamepad2.left_stick_y*SLIDES_MAX);
-//        } else {
-//            telemetry.addData("lift at its max", lift.getCurrentPosition());
-//            telemetry.update();
-//            lift.setPower(0);
-//        }
-
         if (gamepad2.x) {
             //intup up
             intup1.setPosition(INT_UP1);
@@ -373,19 +291,17 @@ public class iterativeTestnoSlides extends OpMode {
             reach.setPosition(SLIDES_OUT);
         }
 
-        if (gamepad1.x){
+        if (gamepad1.y){
             claw.setPosition(CLAW_IN);
         }
-        if (gamepad1.y){
+        if (gamepad1.x){
             claw.setPosition(CLAW_OUT);
         }
 
         double maxSpeed = .9;
-        lf.setPower(leftFrontPower * maxSpeed);
-        rf.setPower(rightFrontPower * maxSpeed);
-        lb.setPower(leftBackPower * maxSpeed);
-        rb.setPower(rightBackPower * maxSpeed);
 
+        setMotorPower(lf,lb,rf,rb,leftFrontPower * maxSpeed,leftBackPower * maxSpeed,
+                rightFrontPower * maxSpeed,rightBackPower * maxSpeed);
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());

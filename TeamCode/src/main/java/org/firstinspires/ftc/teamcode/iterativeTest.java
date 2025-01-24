@@ -101,7 +101,7 @@ public class iterativeTest extends OpMode {
     static final double SHOULDER2_UP = 1;
 
     //TODO: ENCODERS FOR SLIDES - reach and lift
-    static final double SLIDES_MAX = 0.7;
+    static final double SLIDES_MAX = 0.65;
 
     IMU imu;
 

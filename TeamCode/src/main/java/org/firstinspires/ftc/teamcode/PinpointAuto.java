@@ -337,46 +337,4 @@ public class PinpointAuto extends LinearOpMode {
 //                rb.setPower(0);
 //                rf.setPower(0);
             }
-
-            public void strafeLeft(double power, double position, double pos) {
-
-                rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-                rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-                System.out.println("in strafe l");
-
-                lf.setPower(-power);
-                lb.setPower(power);
-                rb.setPower(-power);
-                rf.setPower(power);
-
-                //wait until finishes turning
-                while (Math.abs(rf.getCurrentPosition()) < position && opModeIsActive()) {
-                }
-
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
-            }
-
-            public void strafeRight(double power) {
-
-                lf.setPower(power);
-                lb.setPower(-power);
-                rb.setPower(power);
-                rf.setPower(-power);
-
-                while (opModeIsActive()) {
-                }
-
-                lf.setPower(0);
-                lb.setPower(0);
-                rb.setPower(0);
-                rf.setPower(0);
-                //wait until finishes turning
-
-
-            }
     }
