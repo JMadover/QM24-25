@@ -85,7 +85,7 @@ public class iterativeTestnoSlides extends OpMode {
 //    private DcMotor reach = null;
 
     private CRServo intake2 = null; //port 0 exp hub.
-    private Servo shoulder1 = null; //port 1 exp hub. right
+    private Servo shoulder1 = null; //port 1 exp hub. right NOT USING
     private Servo wrist1 = null; //not being used port 2
     private Servo intup1 = null; //port 3 expansion hub. left
     private Servo claw = null; // port 5 exp
@@ -143,8 +143,8 @@ public class iterativeTestnoSlides extends OpMode {
         slide1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        wrist1.setPosition(WRIST1_UP);
-        wrist2.setPosition(WRIST2_UP);
+        intup1.setPosition(INT_UP1);
+        intup2.setPosition(INT_UP);
 
         intake1.setPower(0);
         intake2.setPower(0);
@@ -284,6 +284,11 @@ public class iterativeTestnoSlides extends OpMode {
             shoulder2.setPosition(SHOULDER2_UP);
         }
 
+        if (gamepad2.left_stick_x>.5){
+            reach.setPosition(SLIDES_OUT);
+        } else if (gamepad2.left_stick_x<-.5){
+            reach.setPosition(SLIDES_IN);
+        }
         if (gamepad1.a){
             reach.setPosition(SLIDES_IN);
         }

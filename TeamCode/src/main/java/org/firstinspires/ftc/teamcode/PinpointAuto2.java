@@ -191,6 +191,9 @@ public class PinpointAuto2 extends LinearOpMode {
         wrist1.setPosition(WRIST1_UP);
         wrist2.setPosition(WRIST2_UP);
 
+        intup1.setPosition(INT_UP1);
+        intup2.setPosition(INT_UP);
+
         intake2.setPower(0);
         intake1.setPower(-0);
 
@@ -243,38 +246,80 @@ public class PinpointAuto2 extends LinearOpMode {
                 telemetry.addData("Velocity", velocity);
 
                 //strafe left
-                while (pos.getX(DistanceUnit.INCH) < 10) {
-                    drive(Direction.F,-.4);
-                    pos = odo.getPosition();
-
-                    telemetry.addData("positionY: ", pos.getY(DistanceUnit.INCH));
-                    telemetry.addData("positionX: ", pos.getX(DistanceUnit.INCH));
-                    telemetry.update();
-                }
-                deposit();
-                double start = pos.getHeading(AngleUnit.DEGREES);
-                while( pos.getHeading(AngleUnit.DEGREES) - start < 90){
-                    drive(Direction.R, .5);
-                }
-                intake();
-                //turn again
-                passThru();
-                deposit();
-
-                while (pos.getY(DistanceUnit.INCH) < 10) {
-                    lf.setPower(-.4);
-                    lb.setPower(.4);
+                while (pos.getX(DistanceUnit.INCH) > -10) {
+                    lb.setPower(-.4);
                     rb.setPower(-.4);
-                    rf.setPower(.4);
-                    odo.update();
+                    rf.setPower(-.4);
+                    lf.setPower(-.4);
                     pos = odo.getPosition();
+                    odo.update();
+                    //drive(Direction.F,-.4);
 
                     telemetry.addData("positionY: ", pos.getY(DistanceUnit.INCH));
                     telemetry.addData("positionX: ", pos.getX(DistanceUnit.INCH));
                     telemetry.update();
-
                 }
 
+                lb.setPower(0);
+                rb.setPower(0);
+                rf.setPower(0);
+                lf.setPower(0);
+
+                ///REPLACE TIME WITH SLEEP
+                ElapsedTime timeTemp = new ElapsedTime();
+                if (timeTemp.seconds() < 3.0) {
+                    slide1.setPower(SLIDES_MAX);
+                    slide2.setPower(SLIDES_MAX);
+                }
+                else if ( timeTemp.seconds() < 4.0){
+                    slide1.setPower(0.1);
+                    slide2.setPower(.1);
+                    wrist1.setPosition(WRIST1_UP);
+                    wrist1.setPosition(WRIST2_UP);
+                    shoulder1.setPosition(SHOULDER1_UP);
+                    shoulder2.setPosition(SHOULDER2_UP);
+                    claw.setPosition(CLAW_OUT);
+                    wrist1.setPosition(WRIST1_DOWN);
+                    wrist1.setPosition(WRIST2_DOWN);
+                    shoulder1.setPosition(SHOULDER1_DOWN);
+                    shoulder2.setPosition(SHOULDER2_DOWN);
+                }
+                else if (timeTemp.seconds()<5.0){
+                    slide1.setPower(-SLIDES_MAX*.8);
+                    slide2.setPower(-SLIDES_MAX*.8);
+                }
+
+               // deposit();
+//                turn(Direction.L, pos.getHeading(AngleUnit.DEGREES), pos);
+//                intake();
+//                turn(Direction.R, pos.getHeading(AngleUnit.DEGREES), pos);
+//                passThru();
+//                deposit();
+//                turn(Direction.L, pos.getHeading(AngleUnit.DEGREES), pos);
+//                intake();
+//                turn(Direction.R, pos.getHeading(AngleUnit.DEGREES), pos);
+//                deposit();
+//                while (pos.getX(DistanceUnit.INCH) <12) {
+//                    drive(Direction.F,-.4);
+//                    pos = odo.getPosition();
+//
+//                    telemetry.addData("positionY: ", pos.getY(DistanceUnit.INCH));
+//                    telemetry.addData("positionX: ", pos.getX(DistanceUnit.INCH));
+//                    telemetry.update();
+//                }
+//                turn(Direction.L, pos.getHeading(AngleUnit.DEGREES), pos);
+//                intake();
+//                turn(Direction.R, pos.getHeading(AngleUnit.DEGREES), pos);
+//                while (pos.getX(DistanceUnit.INCH) >10) {
+//                    drive(Direction.F,.4);
+//                    pos = odo.getPosition();
+//
+//                    telemetry.addData("positionY: ", pos.getY(DistanceUnit.INCH));
+//                    telemetry.addData("positionX: ", pos.getX(DistanceUnit.INCH));
+//                    telemetry.update();
+//                }
+//                passThru();
+//                deposit();
 
             /*
             Gets the Pinpoint device status. Pinpoint can reflect a few states. But we'll primarily see
@@ -354,4 +399,10 @@ public class PinpointAuto2 extends LinearOpMode {
         intake2.setPower(0);
     }
 
+    public void turn (Direction dir, double startPos, Pose2D pos) {
+        while(Math.abs(pos.getHeading(AngleUnit.DEGREES) - startPos) < 90){
+            drive(dir, .5);
+        }
+        odo.update();
+    }
 }
