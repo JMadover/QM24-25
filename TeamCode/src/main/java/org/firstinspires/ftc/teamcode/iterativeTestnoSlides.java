@@ -27,6 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+//TODO: add servo fake continuous for slides
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.Constants.*;
@@ -288,6 +289,19 @@ public class iterativeTestnoSlides extends OpMode {
             reach.setPosition(SLIDES_OUT);
         } else if (gamepad2.left_stick_x<-.5){
             reach.setPosition(SLIDES_IN);
+        }
+        if (gamepad2.right_stick_x>.1){
+            if(reach.getPosition()>=SLIDES_OUT){
+                reach.setPosition(SLIDES_OUT);
+            } else{
+                reach.setPosition(reach.getPosition()+gamepad2.right_stick_x);
+            }
+        } else if (gamepad2.right_stick_x<-.1){
+            if(reach.getPosition()<=SLIDES_IN){
+                reach.setPosition(SLIDES_IN);
+            } else{
+                reach.setPosition(reach.getPosition()+gamepad2.right_stick_x);
+            }
         }
         if (gamepad1.a){
             reach.setPosition(SLIDES_IN);

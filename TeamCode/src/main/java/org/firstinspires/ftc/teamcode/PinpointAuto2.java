@@ -265,31 +265,30 @@ public class PinpointAuto2 extends LinearOpMode {
                 rf.setPower(0);
                 lf.setPower(0);
 
-                ///REPLACE TIME WITH SLEEP
-                ElapsedTime timeTemp = new ElapsedTime();
-                if (timeTemp.seconds() < 3.0) {
-                    slide1.setPower(SLIDES_MAX);
-                    slide2.setPower(SLIDES_MAX);
-                }
-                else if ( timeTemp.seconds() < 4.0){
-                    slide1.setPower(0.1);
-                    slide2.setPower(.1);
-                    wrist1.setPosition(WRIST1_UP);
-                    wrist1.setPosition(WRIST2_UP);
-                    shoulder1.setPosition(SHOULDER1_UP);
-                    shoulder2.setPosition(SHOULDER2_UP);
-                    claw.setPosition(CLAW_OUT);
-                    wrist1.setPosition(WRIST1_DOWN);
-                    wrist1.setPosition(WRIST2_DOWN);
-                    shoulder1.setPosition(SHOULDER1_DOWN);
-                    shoulder2.setPosition(SHOULDER2_DOWN);
-                }
-                else if (timeTemp.seconds()<5.0){
-                    slide1.setPower(-SLIDES_MAX*.8);
-                    slide2.setPower(-SLIDES_MAX*.8);
-                }
+                slide1.setPower(SLIDES_MAX);
+                slide2.setPower(SLIDES_MAX);
+                sleep(3000);
+                slide1.setPower(0.1);
+                slide2.setPower(.1);
+                wrist1.setPosition(WRIST1_UP);
+                wrist1.setPosition(WRIST2_UP);
+                shoulder1.setPosition(SHOULDER1_UP);
+                shoulder2.setPosition(SHOULDER2_UP);
+                claw.setPosition(CLAW_OUT);
+                sleep(1000);
+                wrist1.setPosition(WRIST1_DOWN);
+                wrist1.setPosition(WRIST2_DOWN);
+                shoulder1.setPosition(SHOULDER1_DOWN);
+                shoulder2.setPosition(SHOULDER2_DOWN);
+                sleep(500);
+                slide1.setPower(-SLIDES_MAX * .8);
+                slide2.setPower(-SLIDES_MAX * .8);
+                sleep(2000);
 
-               // deposit();
+                slide1.setPower(0);
+                slide2.setPower(0);
+
+                // deposit();
 //                turn(Direction.L, pos.getHeading(AngleUnit.DEGREES), pos);
 //                intake();
 //                turn(Direction.R, pos.getHeading(AngleUnit.DEGREES), pos);
